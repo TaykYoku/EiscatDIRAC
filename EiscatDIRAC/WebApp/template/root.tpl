@@ -9,33 +9,46 @@
     <script type="text/javascript" src="{{base_url}}/static/core/js/utils/canvg-1.3/rgbcolor.js"></script>
 	  <script type="text/javascript" src="{{base_url}}/static/core/js/utils/canvg-1.3/StackBlur.js"></script>
 	  <script type="text/javascript" src="{{base_url}}/static/core/js/utils/canvg-1.3/canvg.js"></script>
-	  <script type="text/javascript" src="https://cdn.rawgit.com/eligrey/FileSaver.js/master/FileSaver.js"></script>
+	  <script type="text/javascript" src="{{base_url}}/static/core/js/utils/FileSaver/FileSaver.js"></script>
+    <script type="text/javascript" src="{{base_url}}/static/oidc/oidc-client/dist/oidc-client.js"></script>
+	  
+	  {% if bugReportURL!='' %}
+	  	<script type="text/javascript" src="{{bugReportURL}}"></script>
+	  {% end %}
 
-    <link rel="stylesheet" type="text/css" href="{{base_url}}/static/extjs/{{ext_version}}/resources/css/{{theme}}.css" />
+    <link rel="stylesheet" type="text/css" href="{{base_url}}/static/extjs/classic/theme-{{theme}}/resources/theme-{{theme}}-all.css" />
+
     <link rel="stylesheet" type="text/css" href="{{base_url}}/static/core/css/css.css" />
     <link rel="stylesheet" type="text/css" href="{{base_url}}/static/core/css/iconset.css" />
-    <link rel="stylesheet" type="text/css" href="{{base_url}}/static/core/css/TabScrollerMenu.css" />
-    <link rel="stylesheet" type="text/css" href="{{base_url}}/static/core/css/tabtheme.css" />
-
+    <link rel="stylesheet" type="text/css" href="{{base_url}}/static/core/css/tabtheme.css" />    
+ 
     {% autoescape None %}
     <!-- GC -->
 
     <!-- <x-compile> -->
     <!-- <x-bootstrap> -->
-
+	
     {% if _dev %}
        {% if debug_level=='debug' %}
-          <script type="text/javascript" src="{{base_url}}/static/extjs/{{ext_version}}/ext-all-dev.js"></script>
+
+          <script type="text/javascript" src="{{base_url}}/static/extjs/ext-all-debug.js"></script>
+
        {% else %}
-         <script type="text/javascript" src="{{base_url}}/static/extjs/{{ext_version}}/ext-all.js"></script>
+          <script type="text/javascript" src="{{base_url}}/static/extjs/{{ext_version}}/ext-all.js"></script>
        {% end %}
+       <script type="text/javascript" src="{{base_url}}/static/extjs/ux-debug.js"></script>
     {% else %}
+      <script type="text/javascript" src="{{base_url}}/static/extjs/ext-all.js"></script>
       <script type="text/javascript" src="{{base_url}}/static/core/build/all-classes.js"></script>
     {% end %}
+    
+    <script type="text/javascript" src="{{base_url}}/static/extjs/packages/charts/classic/charts.js"></script>
+    <link rel="stylesheet" type="text/css"  href="{{base_url}}/static/extjs/packages/charts/classic/classic/resources/charts-all.css">
+    
     <!-- </x-bootstrap> -->
     <script type="text/javascript">
       google.load("visualization", "1", {packages:["corechart","annotatedtimeline"]});
-
+      
       //Wrap console.log if it does not exist
       if (typeof console == "undefined") {
         window.console = {
@@ -55,8 +68,8 @@
             'Ext.dirac.core': '{{base_url}}/static/core/js/core',
             'Ext.dirac.views': '{{base_url}}/static/core/js/views',
             'Ext.dirac.utils': '{{base_url}}/static/core/js/utils',
-            'Ext.ux.form':'{{base_url}}/static/extjs/{{ext_version}}/examples/ux/form',
-            'Ext.ux':'{{base_url}}/static/extjs/{{ext_version}}/examples/ux'
+            'Ext.ux.form':'{{base_url}}/static/extjs/{{ext_version}}/packages/ux/classic/src/form',
+            'Ext.ux':'{{base_url}}/static/extjs/{{ext_version}}/packages/ux/classic/src'            
           });
 
           Ext.require(['Ext.dirac.core.App','Ext.*']);
@@ -80,7 +93,7 @@
           GLOBAL.VALID_VIEWS = ["desktop","tabs"];
           GLOBAL.MAIN_VIEW_SAVE_STRUCTURE_VERSION = 1;
           GLOBAL.OPEN_APP = "{{open_app}}";
-
+          GLOBAL.BACKGROUND = "{{backgroundImage}}";
 
           Ext.onReady(function () {
 						Ext.override(Ext.data.Connection, { timeout:600000 });
@@ -88,7 +101,7 @@
             GLOBAL.APP = new Ext.dirac.core.App();
             setTimeout(function(){
               Ext.get("app-dirac-loading").hide();
-              Ext.get("app-dirac-loading-msg").setHTML("Loading module. Please wait ...");
+              Ext.get("app-dirac-loading-msg").setHtml("Loading module. Please wait ...");
             },1000);
           });
       {% else %}
@@ -111,6 +124,7 @@
           GLOBAL.VALID_VIEWS = ["desktop","tabs"];
           GLOBAL.MAIN_VIEW_SAVE_STRUCTURE_VERSION = 1;
           GLOBAL.OPEN_APP = "{{open_app}}";
+          GLOBAL.BACKGROUND = "{{backgroundImage}}";
 
           Ext.onReady(function () {
               Ext.override(Ext.data.Connection, { timeout:600000 });
@@ -118,7 +132,7 @@
               GLOBAL.APP = new Ext.dirac.core.App();
               setTimeout(function(){
                 Ext.get("app-dirac-loading").hide();
-                Ext.get("app-dirac-loading-msg").setHTML("Loading module. Please wait ...");
+                Ext.get("app-dirac-loading-msg").setHtml("Loading module. Please wait ...");
               },1000);
           });
       {% end %}
@@ -132,7 +146,7 @@
         <table>
           <tr>
             <td style="width:100px;">
-              <img src="{{base_url}}/static/core/img/icons/system/_logo_waiting.gif" style="margin-right:8px;float:left;vertical-align:top;width:100%;"/>
+              <img src="{{logo}}" style="margin-right:8px;float:left;vertical-align:top;width:100%;"/>
             </td>
             <td style="width:300px;vertical-align:middle;text-align:left;padding:5px 0px 5px 15px;font-size:14px">
               DIRAC
@@ -141,9 +155,10 @@
             </td>
           </tr>
         </table>
-
       </div>
   </div>
+  
+  {{welcome}}
 
 </body>
 </html>
