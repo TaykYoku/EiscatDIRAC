@@ -377,7 +377,8 @@ Ext.define('EiscatDIRAC.FileCatalog.classes.FileCatalog', {
                 url : GLOBAL.BASE_URL + 'FileCatalog/getFilesData',
                 reader : {
                   type : 'json',
-                  root : 'result'
+                  rootProperty : 'result',
+                  keepRawData : true
                 },
                 timeout : 1800000,
                 listeners : {
@@ -407,10 +408,10 @@ Ext.define('EiscatDIRAC.FileCatalog.classes.FileCatalog', {
 
                 load : function(oStore, records, successful, eOpts) {
 
-                  if (oStore.proxy.reader.rawData["total"] == 0)
+                  if (oStore.proxy.getReader().rawData["total"] == 0)
                     GLOBAL.APP.CF.alert("There were no data matching your selection and access policy", "info");
 
-                  me.pagingToolbar.updateStamp.setText('Updated: ' + oStore.proxy.reader.rawData["date"]);
+                  me.pagingToolbar.updateStamp.setText('Updated: ' + oStore.proxy.getReader().rawData["date"]);
                   me.queryPanel.body.unmask();
                   me.metadataCatalogGrid.body.unmask();
                   me.queryPanelToolbarCenter.show();
@@ -474,7 +475,7 @@ Ext.define('EiscatDIRAC.FileCatalog.classes.FileCatalog', {
 
                   me.filesGrid.columns[1].show();
                   me.filesGrid.columns[1].flex = 1;
-                  me.filesGrid.doLayout();
+                  me.filesGrid.updateLayout();
 
                 }
 
@@ -592,14 +593,14 @@ Ext.define('EiscatDIRAC.FileCatalog.classes.FileCatalog', {
                 url : GLOBAL.BASE_URL + 'FileCatalog/getSubnodeFiles',
                 reader : {
                   type : 'json',
-                  root : 'nodes'
+                  rootProperty : 'nodes'
                 }
               },
               root : {
                 text : '/'
               },
               listeners : {
-                beforeexpand : function(oNode, eOpts) {
+                nodebeforeexpand : function(oNode, eOpts) {
                   me.treeFileCatalogStore.proxy.extraParams = {
                     "path" : me.__getNodePath(oNode)
                   };
@@ -620,7 +621,7 @@ Ext.define('EiscatDIRAC.FileCatalog.classes.FileCatalog', {
                   e.preventDefault();
                   if (!oNode.isLeaf()) {
                     me.sectionMenu.node = oNode;
-                    me.sectionMenu.showAt(e.xy);
+                    me.sectionMenu.showAt(e.getXY());
                   }
 
                   return false;
@@ -1707,13 +1708,13 @@ Ext.define('EiscatDIRAC.FileCatalog.classes.FileCatalog', {
         var sPath = ""
         var oCopyRefNode = oNode;
 
-        if (oCopyRefNode.raw.text == "/") {
+        if (oCopyRefNode.get('text') == "/") {
           sPath = "/";
         } else {
 
           while (oCopyRefNode) {
 
-            if (oCopyRefNode.raw.text == "/")
+            if (oCopyRefNode.get('text') == "/")
               break;
 
             // if (oCopyRefNode.get("text"))
