@@ -7,14 +7,15 @@
 
     <script type="text/javascript" src="https://www.google.com/jsapi"></script>
     <script type="text/javascript" src="{{base_url}}/static/core/js/utils/canvg-1.3/rgbcolor.js"></script>
-	  <script type="text/javascript" src="{{base_url}}/static/core/js/utils/canvg-1.3/StackBlur.js"></script>
-	  <script type="text/javascript" src="{{base_url}}/static/core/js/utils/canvg-1.3/canvg.js"></script>
-	  <script type="text/javascript" src="{{base_url}}/static/core/js/utils/FileSaver/FileSaver.js"></script>
-    <script type="text/javascript" src="{{base_url}}/static/oidc/oidc-client/dist/oidc-client.js"></script>
-	  
-	  {% if bugReportURL!='' %}
-	  	<script type="text/javascript" src="{{bugReportURL}}"></script>
-	  {% end %}
+    <script type="text/javascript" src="{{base_url}}/static/core/js/utils/canvg-1.3/StackBlur.js"></script>
+    <script type="text/javascript" src="{{base_url}}/static/core/js/utils/canvg-1.3/canvg.js"></script>
+    <script type="text/javascript" src="{{base_url}}/static/core/js/utils/FileSaver/FileSaver.js"></script>
+
+    {% if bugReportURL!='' %}
+      {% for item in bugReportURL.split(',') %}
+        <script type="text/javascript" src="{{escape(item)}}"></script>
+      {% end %}
+    {% end %}
 
     <link rel="stylesheet" type="text/css" href="{{base_url}}/static/extjs/classic/theme-{{theme}}/resources/theme-{{theme}}-all.css" />
 
@@ -29,14 +30,12 @@
     <!-- <x-bootstrap> -->
 	
     {% if _dev %}
-       {% if debug_level=='debug' %}
-
-          <script type="text/javascript" src="{{base_url}}/static/extjs/ext-all-debug.js"></script>
-
-       {% else %}
-          <script type="text/javascript" src="{{base_url}}/static/extjs/{{ext_version}}/ext-all.js"></script>
-       {% end %}
-       <script type="text/javascript" src="{{base_url}}/static/extjs/ux-debug.js"></script>
+      {% if debug_level=='debug' %}
+        <script type="text/javascript" src="{{base_url}}/static/extjs/ext-all-debug.js"></script>
+      {% else %}
+        <script type="text/javascript" src="{{base_url}}/static/extjs/{{ext_version}}/ext-all.js"></script>
+      {% end %}
+      <script type="text/javascript" src="{{base_url}}/static/extjs/ux-debug.js"></script>
     {% else %}
       <script type="text/javascript" src="{{base_url}}/static/extjs/ext-all.js"></script>
       <script type="text/javascript" src="{{base_url}}/static/core/build/all-classes.js"></script>
@@ -96,13 +95,24 @@
           GLOBAL.BACKGROUND = "{{backgroundImage}}";
 
           Ext.onReady(function () {
-						Ext.override(Ext.data.Connection, { timeout:600000 });
-						Ext.override(Ext.data.proxy.Ajax, { timeout:600000 });
+            Ext.override(Ext.data.Connection, {timeout:600000});
+            Ext.Ajax.setTimeout(600000);
             GLOBAL.APP = new Ext.dirac.core.App();
+            Ext.state.Manager.setProvider(Ext.create('Ext.state.CookieProvider'));
             setTimeout(function(){
               Ext.get("app-dirac-loading").hide();
               Ext.get("app-dirac-loading-msg").setHtml("Loading module. Please wait ...");
             },1000);
+            if (location.protocol === 'http:') {
+              var https_url = location.href.replace('http:', 'https:');
+              https_url = https_url.replace(":{{ http_port }}/", ":{{ https_port }}/");
+              Ext.dirac.system_info.msg(
+                "Notification",
+                'Running without authentication, did you mean: '+
+                '<a href="'+https_url+'">'+https_url+'</a>?',
+                false
+              );
+            };
           });
       {% else %}
           var GLOBAL = {};
@@ -127,9 +137,10 @@
           GLOBAL.BACKGROUND = "{{backgroundImage}}";
 
           Ext.onReady(function () {
-              Ext.override(Ext.data.Connection, { timeout:600000 });
-				      Ext.override(Ext.data.proxy.Ajax, { timeout:600000 });
+              Ext.override(Ext.data.Connection, {timeout:600000});
+	            Ext.Ajax.setTimeout(600000);
               GLOBAL.APP = new Ext.dirac.core.App();
+              Ext.state.Manager.setProvider(Ext.create('Ext.state.CookieProvider'));
               setTimeout(function(){
                 Ext.get("app-dirac-loading").hide();
                 Ext.get("app-dirac-loading-msg").setHtml("Loading module. Please wait ...");
