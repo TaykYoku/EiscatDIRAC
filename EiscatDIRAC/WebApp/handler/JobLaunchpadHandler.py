@@ -1,7 +1,6 @@
 import pprint
-import tempfile
 
-from DIRAC import gConfig, gLogger
+from DIRAC import gLogger
 from DIRAC.Resources.Catalog.FileCatalog import FileCatalog
 from DIRAC.ConfigurationSystem.Client.Helpers.Registry import getVOForGroup
 from DIRAC.ConfigurationSystem.Client.Helpers.Operations import Operations
