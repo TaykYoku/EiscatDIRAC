@@ -13,7 +13,7 @@ class JobLaunchpadHandler(JobLaunchpad):
   def __init__(self, *args, **kwargs):
     super(JobLaunchpadHandler, self).__init__(*args, **kwargs)
     sessionData = self.getSessionData()
-    for opt, value in (self.appSettings().get("defaultParams") or {}).items():
+    for opt, value in (self.getAppSettings().get("Options") or {}).items():
       self.defaultParams[opt] = value.replace(', ', ',').split(',')
     self.user = sessionData['user'].get('username', '')
     self.group = sessionData['user'].get('group', '')
