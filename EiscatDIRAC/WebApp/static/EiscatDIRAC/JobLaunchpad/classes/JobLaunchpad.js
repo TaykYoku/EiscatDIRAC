@@ -319,7 +319,7 @@ Ext.define('EiscatDIRAC.JobLaunchpad.classes.JobLaunchpad', {
 
         var me = this.moduleObject;
 
-        var sPredefinedSet = me.predefinedSetsMenu.node.raw.text;
+        var sPredefinedSet = me.predefinedSetsMenu.node.data.text;
 
         for (var sKey in me.predefinedSets[sPredefinedSet]) {
 
@@ -696,7 +696,7 @@ Ext.define('EiscatDIRAC.JobLaunchpad.classes.JobLaunchpad', {
 
                   beforeitemcontextmenu : function(oView, oNode, item, index, e, eOpts) {
 
-                    if (oNode.raw.predefinedSets) {
+                    if (oNode.data.predefinedSets) {
 
                       e.preventDefault();
 
